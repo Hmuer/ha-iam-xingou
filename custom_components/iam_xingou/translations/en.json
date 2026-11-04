@@ -10,7 +10,7 @@
       },
       "sms": {
         "title": "Enter the SMS code",
-        "description": "A code was sent to {phone} (valid ~5 minutes). If it does not arrive, request one in the Xingou app and enter it here.",
+        "description": "Enter the SMS code. If you did not receive one, request it in the Xingou app and enter it here (valid ~5 minutes).",
         "data": {
           "code": "SMS code"
         }
@@ -31,7 +31,7 @@
       },
       "reauth_sms": {
         "title": "Enter the SMS code",
-        "description": "A code was sent to {phone}. You can also request one in the app.",
+        "description": "Enter the SMS code. You can request one in the Xingou app.",
         "data": {
           "code": "SMS code"
         }
