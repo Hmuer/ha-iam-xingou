@@ -1,0 +1,6 @@
+{
+  "name": "IAM Xingou Air Purifier",
+  "render_readme": true,
+  "homeassistant": "2024.6.0",
+  "zip_release": false
+}

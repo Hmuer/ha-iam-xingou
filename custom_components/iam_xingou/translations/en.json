@@ -1,0 +1,84 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sign in to Xingou",
+        "description": "Enter the phone number registered with the Xingou (心够智家) app. An SMS code will be sent.",
+        "data": {
+          "phone": "Phone number"
+        }
+      },
+      "sms": {
+        "title": "Enter the SMS code",
+        "description": "A code was sent to {phone}. It is valid for about 5 minutes.",
+        "data": {
+          "code": "SMS code"
+        }
+      },
+      "devices": {
+        "title": "Select devices",
+        "description": "Choose the purifier(s) to add to Home Assistant.",
+        "data": {
+          "devices": "Devices"
+        }
+      },
+      "reauth_user": {
+        "title": "Re-authenticate",
+        "description": "Your session expired, please sign in again.",
+        "data": {
+          "phone": "Phone number"
+        }
+      },
+      "reauth_sms": {
+        "title": "Enter the SMS code",
+        "description": "A code was sent to {phone}.",
+        "data": {
+          "code": "SMS code"
+        }
+      }
+    },
+    "error": {
+      "sms_failed": "Could not send the SMS code. Check the phone number and try again.",
+      "invalid_code": "Wrong or expired code",
+      "cannot_connect": "Cannot reach the Xingou cloud",
+      "no_devices": "No device found on this account",
+      "unknown": "Unexpected error, check the logs",
+      "invalid_json": "The key mapping must be a valid JSON object"
+    },
+    "abort": {
+      "reauth_successful": "Re-authentication successful",
+      "already_configured": "This account is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "description": "Polling interval and advanced overrides.",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "key_map": "Property key mapping (JSON, optional)"
+        }
+      }
+    },
+    "error": {
+      "invalid_json": "The key mapping must be a valid JSON object"
+    }
+  },
+  "services": {
+    "oper_cmd": {
+      "name": "Send raw command",
+      "description": "Send a raw property command, e.g. {\"power\": 1}.",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "Cloud device id"
+        },
+        "command": {
+          "name": "Command",
+          "description": "Property dictionary, e.g. {\"power\": 1, \"speed\": 3}"
+        }
+      }
+    }
+  }
+}

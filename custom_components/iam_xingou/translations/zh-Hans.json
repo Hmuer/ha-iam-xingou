@@ -1,0 +1,84 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "登录心够智家",
+        "description": "输入注册心够智家的手机号，我们会发送短信验证码。",
+        "data": {
+          "phone": "手机号"
+        }
+      },
+      "sms": {
+        "title": "输入验证码",
+        "description": "验证码已发送到 {phone}，请在 5 分钟内输入。",
+        "data": {
+          "code": "短信验证码"
+        }
+      },
+      "devices": {
+        "title": "选择设备",
+        "description": "选择要接入 Home Assistant 的净化器。",
+        "data": {
+          "devices": "设备"
+        }
+      },
+      "reauth_user": {
+        "title": "重新登录心够智家",
+        "description": "登录状态已过期，请重新登录。",
+        "data": {
+          "phone": "手机号"
+        }
+      },
+      "reauth_sms": {
+        "title": "输入验证码",
+        "description": "验证码已发送到 {phone}。",
+        "data": {
+          "code": "短信验证码"
+        }
+      }
+    },
+    "error": {
+      "sms_failed": "短信发送失败，请检查手机号或稍后再试",
+      "invalid_code": "验证码错误或已过期",
+      "cannot_connect": "无法连接心够智家服务器",
+      "no_devices": "该账号下没有找到设备",
+      "unknown": "未知错误，请查看日志",
+      "invalid_json": "键值映射必须是合法的 JSON 对象"
+    },
+    "abort": {
+      "reauth_successful": "重新登录成功",
+      "already_configured": "该账号已经配置过了"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "选项",
+        "description": "轮询间隔与高级映射。键值映射可留空。",
+        "data": {
+          "scan_interval": "轮询间隔（秒）",
+          "key_map": "属性键映射（JSON，可选）"
+        }
+      }
+    },
+    "error": {
+      "invalid_json": "键值映射必须是合法的 JSON 对象"
+    }
+  },
+  "services": {
+    "oper_cmd": {
+      "name": "发送原始指令",
+      "description": "向设备下发原始属性指令，例如 {\"power\": 1}。",
+      "fields": {
+        "device_id": {
+          "name": "设备 ID",
+          "description": "云平台上的设备 ID"
+        },
+        "command": {
+          "name": "指令",
+          "description": "属性字典，例如 {\"power\": 1, \"speed\": 3}"
+        }
+      }
+    }
+  }
+}
