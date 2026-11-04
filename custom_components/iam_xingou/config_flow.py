@@ -73,7 +73,11 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
             try:
                 await api.async_send_code(phone)
             except IamXingouRateLimitError:
-                errors["base"] = "sms_rate_limited"
+                # Too many requests: still allow the user to enter a code that
+                # was requested from the official app (same cloud backend).
+                self._phone = phone
+                self._api = api
+                return await self.async_step_sms()
             except IamXingouError as err:
                 _LOGGER.warning("send code failed: %s", err)
                 errors["base"] = "sms_failed"
@@ -190,7 +194,9 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
             try:
                 await api.async_send_code(phone)
             except IamXingouRateLimitError:
-                errors["base"] = "sms_rate_limited"
+                self._phone = phone
+                self._api = api
+                return await self.async_step_reauth_sms()
             except IamXingouError:
                 errors["base"] = "sms_failed"
             else:
