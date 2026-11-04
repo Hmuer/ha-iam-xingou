@@ -66,6 +66,12 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        """Choose between the SMS login and a manual token import."""
+        return self.async_show_menu(step_id="user", menu_options=["phone", "token"])
+
+    async def async_step_phone(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             phone = user_input[CONF_PHONE].strip()
@@ -87,12 +93,56 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
                 return await self.async_step_sms()
 
         return self.async_show_form(
-            step_id="user",
+            step_id="phone",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_PHONE): TextSelector(
                         TextSelectorConfig(type=TextSelectorType.TEL)
                     )
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_token(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Import an existing access token (useful while SMS is rate limited)."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            token = user_input[CONF_TOKEN].strip()
+            user_name = user_input[CONF_USER_NAME].strip()
+            user_id = (user_input.get("user_id") or "").strip()
+            api = IamXingouApi(
+                async_get_clientsession(self.hass),
+                token=token,
+                user_name=user_name,
+                user_id=user_id,
+            )
+            try:
+                home = await api.async_homepage()
+            except IamXingouAuthError:
+                errors["base"] = "invalid_token"
+            except IamXingouError as err:
+                _LOGGER.warning("token import failed: %s", err)
+                errors["base"] = "unknown"
+            else:
+                self._devices = extract_devices(home)
+                if not self._devices:
+                    errors["base"] = "no_devices"
+                else:
+                    self._api = api
+                    self._phone = user_name
+                    await self.async_set_unique_id(user_name)
+                    return await self.async_step_devices()
+
+        return self.async_show_form(
+            step_id="token",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_TOKEN): TextSelector(),
+                    vol.Required(CONF_USER_NAME): TextSelector(),
+                    vol.Optional("user_id"): TextSelector(),
                 }
             ),
             errors=errors,

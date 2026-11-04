@@ -28,29 +28,32 @@ MAX_SCAN_INTERVAL = 900
 # The integration stays data driven: unknown properties are still exposed
 # as plain sensors, and these aliases only decide the *type* of the entity.
 POWER_KEYS = (
-    "power", "Power", "powerSwitch", "PowerSwitch", "switch", "Switch",
-    "onOff", "OnOff", "deviceSwitch", "mainSwitch",
+    "powerstate", "power", "Power", "powerSwitch", "PowerSwitch", "switch",
+    "Switch", "onOff", "OnOff", "deviceSwitch", "mainSwitch",
 )
 SPEED_KEYS = (
-    "speed", "Speed", "windSpeed", "fanSpeed", "windLevel", "gear",
-    "fanLevel", "windspeed", "level",
+    "windspeed", "speed", "Speed", "windSpeed", "fanSpeed", "windLevel",
+    "gear", "fanLevel", "level",
 )
 MODE_KEYS = (
     "mode", "Mode", "workMode", "WorkMode", "pattern", "runMode",
     "workingMode", "sceneMode",
 )
-PM25_KEYS = ("pm25", "PM25", "pm2p5", "pm2_5", "PM2P5", "pm2.5")
-PM10_KEYS = ("pm10", "PM10")
+PM25_KEYS = ("PM25", "pm25", "pm2p5", "pm2_5", "PM2P5", "pm2.5")
+PM10_KEYS = ("PM10", "pm10")
+PM1_KEYS = ("PM1", "pm1")
 TVOC_KEYS = ("tvoc", "TVOC", "voc", "VOC", "vocValue")
-HCHO_KEYS = ("hcho", "HCHO", "formaldehyde", "ch2o", "CH2O")
+HCHO_KEYS = ("HCHO", "hcho", "formaldehyde", "ch2o", "CH2O")
 CO2_KEYS = ("co2", "CO2", "carbonDioxide")
-TEMP_KEYS = ("temp", "Temp", "temperature", "Temperature", "indoorTemp")
-HUMIDITY_KEYS = ("humidity", "Humidity", "rh", "RH", "humid")
+TEMP_KEYS = ("CuTemperature", "temp", "Temp", "temperature", "Temperature", "indoorTemp")
+HUMIDITY_KEYS = ("CurrentHumidity", "humidity", "Humidity", "rh", "RH", "humid")
 FILTER_KEYS = (
     "filterLife", "filter", "Filter", "filterPercent", "filterLeft",
-    "filterLifePercent", "filterRemain", "lifePercent",
+    "filterLifePercent", "filterRemain", "lifePercent", "filterStatusOne",
+    "filterStatusTwo",
 )
-AQI_KEYS = ("aqi", "AQI", "airQuality", "airQualityIndex")
+FILTER_RUNTIME_KEYS = ("FilterRunTime1", "FilterRunTime2", "filterRunTime")
+AQI_KEYS = ("airQualityGrade", "aqi", "AQI", "airQuality", "airQualityIndex")
 
 NUMERIC_UNIT_MAP = {
     "pm25": "µg/m³",

@@ -20,8 +20,10 @@ from .entity import (
     CATEGORY_AQI,
     CATEGORY_CO2,
     CATEGORY_FILTER,
+    CATEGORY_FILTER_RUNTIME,
     CATEGORY_HCHO,
     CATEGORY_HUMIDITY,
+    CATEGORY_PM1,
     CATEGORY_PM10,
     CATEGORY_PM25,
     CATEGORY_POWER,
@@ -67,7 +69,9 @@ def _unit_for(category: str | None, value: Any) -> str | None:
         return PERCENTAGE
     if category == CATEGORY_FILTER:
         return PERCENTAGE
-    if category in (CATEGORY_PM25, CATEGORY_PM10, CATEGORY_TVOC):
+    if category == CATEGORY_FILTER_RUNTIME:
+        return "h"
+    if category in (CATEGORY_PM25, CATEGORY_PM10, CATEGORY_PM1, CATEGORY_TVOC):
         return "µg/m³"
     if category == CATEGORY_HCHO:
         return "mg/m³"
@@ -80,10 +84,12 @@ def _device_class_for(category: str | None) -> SensorDeviceClass | None:
     mapping = {
         CATEGORY_PM25: SensorDeviceClass.PM25,
         CATEGORY_PM10: SensorDeviceClass.PM10,
+        CATEGORY_PM1: SensorDeviceClass.PM1,
         CATEGORY_TVOC: SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
         CATEGORY_CO2: SensorDeviceClass.CO2,
         CATEGORY_TEMPERATURE: SensorDeviceClass.TEMPERATURE,
         CATEGORY_HUMIDITY: SensorDeviceClass.HUMIDITY,
+        CATEGORY_FILTER_RUNTIME: SensorDeviceClass.DURATION,
         CATEGORY_AQI: SensorDeviceClass.AQI,
     }
     return mapping.get(category)

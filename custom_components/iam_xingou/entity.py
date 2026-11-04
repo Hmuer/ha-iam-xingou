@@ -12,13 +12,16 @@ from .const import (
     CO2_KEYS,
     DOMAIN,
     FILTER_KEYS,
+    FILTER_RUNTIME_KEYS,
     HCHO_KEYS,
     HUMIDITY_KEYS,
     KEY_LABELS,
     MODE_KEYS,
     PM10_KEYS,
+    PM1_KEYS,
     PM25_KEYS,
     POWER_KEYS,
+    REAL_KEY_LABELS,
     SPEED_KEYS,
     TEMP_KEYS,
     TVOC_KEYS,
@@ -30,12 +33,14 @@ CATEGORY_SPEED = "speed"
 CATEGORY_MODE = "mode"
 CATEGORY_PM25 = "pm25"
 CATEGORY_PM10 = "pm10"
+CATEGORY_PM1 = "pm1"
 CATEGORY_TVOC = "tvoc"
 CATEGORY_HCHO = "hcho"
 CATEGORY_CO2 = "co2"
 CATEGORY_TEMPERATURE = "temperature"
 CATEGORY_HUMIDITY = "humidity"
 CATEGORY_FILTER = "filterLife"
+CATEGORY_FILTER_RUNTIME = "filterRuntime"
 CATEGORY_AQI = "aqi"
 
 CATEGORY_KEYS: dict[str, tuple[str, ...]] = {
@@ -44,34 +49,40 @@ CATEGORY_KEYS: dict[str, tuple[str, ...]] = {
     CATEGORY_MODE: MODE_KEYS,
     CATEGORY_PM25: PM25_KEYS,
     CATEGORY_PM10: PM10_KEYS,
+    CATEGORY_PM1: PM1_KEYS,
     CATEGORY_TVOC: TVOC_KEYS,
     CATEGORY_HCHO: HCHO_KEYS,
     CATEGORY_CO2: CO2_KEYS,
     CATEGORY_TEMPERATURE: TEMP_KEYS,
     CATEGORY_HUMIDITY: HUMIDITY_KEYS,
     CATEGORY_FILTER: FILTER_KEYS,
+    CATEGORY_FILTER_RUNTIME: FILTER_RUNTIME_KEYS,
     CATEGORY_AQI: AQI_KEYS,
 }
 
 CATEGORY_UNITS: dict[str, str | None] = {
     CATEGORY_PM25: "µg/m³",
     CATEGORY_PM10: "µg/m³",
+    CATEGORY_PM1: "µg/m³",
     CATEGORY_TVOC: "µg/m³",
     CATEGORY_HCHO: "mg/m³",
     CATEGORY_CO2: "ppm",
     CATEGORY_TEMPERATURE: "°C",
     CATEGORY_HUMIDITY: "%",
     CATEGORY_FILTER: "%",
+    CATEGORY_FILTER_RUNTIME: "h",
     CATEGORY_AQI: None,
 }
 
 CATEGORY_DEVICE_CLASS: dict[str, str | None] = {
     CATEGORY_PM25: "pm25",
     CATEGORY_PM10: "pm10",
+    CATEGORY_PM1: "pm1",
     CATEGORY_TVOC: "volatile_organic_compounds",
     CATEGORY_CO2: "carbon_dioxide",
     CATEGORY_TEMPERATURE: "temperature",
     CATEGORY_HUMIDITY: "humidity",
+    CATEGORY_FILTER_RUNTIME: "duration",
     CATEGORY_AQI: "aqi",
 }
 
@@ -90,19 +101,23 @@ def classify(key: str) -> str | None:
         return CATEGORY_PM25
     if "pm10" in lowered:
         return CATEGORY_PM10
+    if lowered in ("pm1", "pm1p0"):
+        return CATEGORY_PM1
     if "tvoc" in lowered or lowered == "voc":
         return CATEGORY_TVOC
     if "hcho" in lowered or "formaldehyde" in lowered:
         return CATEGORY_HCHO
     if "co2" in lowered:
         return CATEGORY_CO2
+    if "filterruntime" in lowered or "filterruntime" in key.lower():
+        return CATEGORY_FILTER_RUNTIME
     if "temp" in lowered:
         return CATEGORY_TEMPERATURE
     if "humi" in lowered or lowered in ("rh", "hum"):
         return CATEGORY_HUMIDITY
     if "filter" in lowered:
         return CATEGORY_FILTER
-    if "aqi" in lowered:
+    if "aqi" in lowered or "airquality" in lowered:
         return CATEGORY_AQI
     if "speed" in lowered or "wind" in lowered or "gear" in lowered:
         return CATEGORY_SPEED
@@ -115,6 +130,8 @@ def classify(key: str) -> str | None:
 
 def label_for(key: str) -> str:
     """Human readable entity name for a property key."""
+    if key in REAL_KEY_LABELS:
+        return REAL_KEY_LABELS[key]
     category = classify(key)
     if category and category in KEY_LABELS:
         return KEY_LABELS[category]
