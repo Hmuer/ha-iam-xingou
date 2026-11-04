@@ -29,6 +29,7 @@ from .api import (
     IamXingouAuthError,
     IamXingouConnectionError,
     IamXingouError,
+    IamXingouRateLimitError,
     extract_devices,
 )
 from .const import (
@@ -71,6 +72,8 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
             api = IamXingouApi(async_get_clientsession(self.hass))
             try:
                 await api.async_send_code(phone)
+            except IamXingouRateLimitError:
+                errors["base"] = "sms_rate_limited"
             except IamXingouError as err:
                 _LOGGER.warning("send code failed: %s", err)
                 errors["base"] = "sms_failed"
@@ -186,6 +189,8 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
             api = IamXingouApi(async_get_clientsession(self.hass))
             try:
                 await api.async_send_code(phone)
+            except IamXingouRateLimitError:
+                errors["base"] = "sms_rate_limited"
             except IamXingouError:
                 errors["base"] = "sms_failed"
             else:

@@ -41,6 +41,10 @@ class IamXingouConnectionError(IamXingouError):
     """Raised on network problems."""
 
 
+class IamXingouRateLimitError(IamXingouError):
+    """Raised when the cloud refuses to send another SMS code (status 1020)."""
+
+
 def _headers(token: str | None = None, user_name: str | None = None) -> dict[str, str]:
     headers = {
         "User-Agent": "okhttp/3.12.13",
@@ -125,6 +129,9 @@ class IamXingouApi:
 
         if status in AUTH_EXPIRED_STATUSES:
             raise IamXingouAuthError(message or "login expired")
+
+        if status == "1020":
+            raise IamXingouRateLimitError(message or "too many requests")
 
         if status not in SUCCESS_STATUSES and result is None:
             raise IamXingouError(f"API error {status}: {message}")

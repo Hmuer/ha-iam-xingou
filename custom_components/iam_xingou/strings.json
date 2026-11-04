@@ -38,7 +38,7 @@
       }
     },
     "error": {
-      "sms_failed": "短信发送失败，请检查手机号或稍后再试",
+      "sms_failed": "短信发送失败，请检查手机号","sms_rate_limited": "发送太频繁，请等待 1-2 分钟后再试",
       "invalid_code": "验证码错误或已过期",
       "cannot_connect": "无法连接心够智家服务器",
       "no_devices": "该账号下没有找到设备",

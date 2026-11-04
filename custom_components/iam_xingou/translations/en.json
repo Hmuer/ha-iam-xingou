@@ -38,7 +38,7 @@
       }
     },
     "error": {
-      "sms_failed": "Could not send the SMS code. Check the phone number and try again.",
+      "sms_failed": "Could not send the SMS code. Check the phone number and try again.","sms_rate_limited": "Too many requests. Wait 1-2 minutes and try again.",
       "invalid_code": "Wrong or expired code",
       "cannot_connect": "Cannot reach the Xingou cloud",
       "no_devices": "No device found on this account",
