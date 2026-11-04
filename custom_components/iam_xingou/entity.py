@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -196,6 +197,7 @@ class IamXingouEntity(CoordinatorEntity[IamXingouCoordinator]):
         )
 
     async def async_send_command(self, command: dict[str, Any]) -> None:
-        """Send a command and refresh afterwards."""
+        """Send a command, wait for the cloud to apply it, then refresh."""
         await self.coordinator.api.async_oper_cmd(self._device_id, command)
-        await self.coordinator.async_request_refresh()
+        await asyncio.sleep(1.5)
+        await self.coordinator.async_refresh()
