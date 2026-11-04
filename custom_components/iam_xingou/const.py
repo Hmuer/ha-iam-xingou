@@ -83,4 +83,41 @@ KEY_LABELS = {
     "power": "电源",
 }
 
+# Friendly names for property keys observed on real IAM devices.
+REAL_KEY_LABELS = {
+    "powerstate": "电源",
+    "windspeed": "风速",
+    "mode": "模式",
+    "PM1": "PM1.0",
+    "PM25": "PM2.5",
+    "PM10": "PM10",
+    "PM1Level": "PM1.0 等级",
+    "PM25Level": "PM2.5 等级",
+    "PM10Level": "PM10 等级",
+    "HCHO": "甲醛",
+    "HCHOLevel": "甲醛等级",
+    "CuTemperature": "温度",
+    "CurrentHumidity": "湿度",
+    "airQualityGrade": "空气质量等级",
+    "T_ON_AQIGrade": "开机空气质量阈值",
+    "T_OFF_AQIGrade": "关机空气质量阈值",
+    "FilterRunTime1": "滤芯1使用时长",
+    "FilterRunTime2": "滤芯2使用时长",
+    "filterStatusOne": "滤芯1状态",
+    "filterStatusTwo": "滤芯2状态",
+    "AllergenLevel": "过敏原等级",
+    "IonsSwitch": "负离子",
+    "MoodLightLevel": "氛围灯",
+    "OSD": "屏幕显示",
+    "childLockOnOff": "童锁",
+    "errorCode": "故障码",
+    "TimingOn": "定时开机",
+    "TimingOff": "定时关机",
+    "RemainingTime": "剩余时间",
+    "RunTime": "累计运行时间",
+    "TrustSwitch": "信任模式",
+    "ForceUnbind": "强制解绑",
+    "KJProductType": "产品类型",
+}
+
 PLATFORMS = ["sensor", "binary_sensor", "select", "fan"]

@@ -194,17 +194,21 @@ def extract_devices(home: Any) -> list[dict[str, Any]]:
             continue
         if device_id in devices:
             continue
+        model = str(
+            item.get("productName") or item.get("modelName") or item.get("model") or ""
+        )
         name = (
             item.get("deviceName")
             or item.get("devName")
             or item.get("name")
             or item.get("nickName")
-            or device_id
         )
+        if not name:
+            name = "IAM 净化器" if model else f"IAM {device_id[-6:]}"
         devices[device_id] = {
             "device_id": device_id,
             "name": str(name),
-            "model": str(item.get("productName") or item.get("model") or ""),
+            "model": model,
             "raw": item,
         }
     return list(devices.values())

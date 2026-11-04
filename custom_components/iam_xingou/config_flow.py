@@ -193,6 +193,7 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
                 {
                     CONF_DEVICE_ID: d["device_id"],
                     CONF_DEVICE_NAME: d["name"],
+                    "model": d.get("model", ""),
                 }
                 for d in self._devices
                 if d["device_id"] in selected

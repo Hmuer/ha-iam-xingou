@@ -180,11 +180,19 @@ class IamXingouEntity(CoordinatorEntity[IamXingouCoordinator]):
 
     @property
     def device_info(self) -> DeviceInfo:
+        model = next(
+            (
+                d.get("model")
+                for d in self.coordinator.devices
+                if d["device_id"] == self._device_id
+            ),
+            "",
+        )
         return DeviceInfo(
             identifiers={(DOMAIN, self._device_id)},
-            name=self._device_data.get("name") or self._device_id,
+            name=self._device_data.get("name") or model or self._device_id,
             manufacturer="IAM",
-            model="M9 Pro (Xingou cloud)",
+            model=model or "Air Purifier (Xingou cloud)",
         )
 
     async def async_send_command(self, command: dict[str, Any]) -> None:

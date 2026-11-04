@@ -46,7 +46,11 @@ class IamXingouCoordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]]):
     ) -> None:
         self.api = api
         self.devices: list[dict[str, str]] = [
-            {"device_id": d[CONF_DEVICE_ID], "name": d[CONF_DEVICE_NAME]}
+            {
+                "device_id": d[CONF_DEVICE_ID],
+                "name": d.get(CONF_DEVICE_NAME) or d[CONF_DEVICE_ID],
+                "model": d.get("model", ""),
+            }
             for d in entry.options.get(CONF_DEVICES, entry.data.get(CONF_DEVICES, []))
         ]
         interval = entry.options.get(
