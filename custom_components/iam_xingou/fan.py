@@ -8,11 +8,6 @@ from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util.percentage import (
-    int_states_in_range,
-    percentage_to_ranged_value,
-    ranged_value_to_percentage,
-)
 
 from .const import DOMAIN
 from .coordinator import IamXingouCoordinator
@@ -52,7 +47,7 @@ class IamXingouPurifierFan(IamXingouEntity, FanEntity):
     """Air purifier exposed as a fan entity."""
 
     _attr_name = None
-    _attr_speed_count = int_states_in_range(SPEED_RANGE)
+    _attr_speed_count = SPEED_RANGE[1]
 
     def __init__(self, coordinator: IamXingouCoordinator, device_id: str) -> None:
         super().__init__(coordinator, device_id)
@@ -114,7 +109,7 @@ class IamXingouPurifierFan(IamXingouEntity, FanEntity):
         value = self._speed_value()
         if value is None:
             return None
-        return ranged_value_to_percentage(SPEED_RANGE, max(value, 0))
+        return min(100, max(0, int(round(value * 100 / SPEED_RANGE[1]))))
 
     @property
     def preset_modes(self) -> list[str] | None:
@@ -165,18 +160,14 @@ class IamXingouPurifierFan(IamXingouEntity, FanEntity):
         if percentage == 0:
             await self.async_turn_off()
             return
-        level = percentage_to_ranged_value(SPEED_RANGE, percentage)
-        await self.async_send_command({speed_key: int(last_value(level))})
+        level = max(
+            SPEED_RANGE[0],
+            min(SPEED_RANGE[1], round(percentage * SPEED_RANGE[1] / 100)),
+        )
+        await self.async_send_command({speed_key: int(level)})
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         mode_key = self._mode_key
         if not mode_key:
             return
         await self.async_send_command({mode_key: preset_mode})
-
-
-def last_value(value: Any) -> Any:
-    """Return a scalar from a possibly tuple value."""
-    if isinstance(value, (tuple, list)):
-        return value[-1]
-    return value

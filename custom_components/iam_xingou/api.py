@@ -105,6 +105,8 @@ class IamXingouApi:
     ) -> Any:
         url = BASE_URL + path
         headers = _headers(self.token, self.user_name)
+        if json_body is not None:
+            headers["Content-Type"] = "application/json"
         try:
             async with self._session.post(
                 url,
