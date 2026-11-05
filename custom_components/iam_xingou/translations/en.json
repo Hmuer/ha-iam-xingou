@@ -61,7 +61,8 @@
                                  "no_devices":  "No device found on this account",
                                  "unknown":  "Unexpected error, check the logs",
                                  "invalid_json":  "The key mapping must be a valid JSON object",
-                                 "invalid_token":  "Invalid or expired token"
+                                 "invalid_token":  "Invalid or expired token",
+                                 "sms_maybe_failed":  "The SMS API returned an error, but the code may still have been delivered. Enter it below; if you did not get one, retry later or use manual token import."
                              },
                    "abort":  {
                                  "reauth_successful":  "Re-authentication successful",

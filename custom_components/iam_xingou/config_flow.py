@@ -61,6 +61,7 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
         self._phone: str = ""
         self._api: IamXingouApi | None = None
         self._devices: list[dict[str, str]] = []
+        self._sms_warning: bool = False
 
     # ------------------------------------------------------------ user steps
     async def async_step_user(
@@ -85,8 +86,14 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
                 self._api = api
                 return await self.async_step_sms()
             except IamXingouError as err:
-                _LOGGER.warning("send code failed: %s", err)
-                errors["base"] = "sms_failed"
+                # The cloud sometimes answers with an error code while still
+                # delivering the SMS. Never block the flow on this: let the
+                # user type the code (or request it from the official app).
+                _LOGGER.warning("send code failed, continuing anyway: %s", err)
+                self._phone = phone
+                self._api = api
+                self._sms_warning = True
+                return await self.async_step_sms()
             else:
                 self._phone = phone
                 self._api = api
@@ -170,6 +177,9 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
                 else:
                     await self.async_set_unique_id(self._api.user_name or self._phone)
                     return await self.async_step_devices()
+
+        if self._sms_warning and not errors:
+            errors["base"] = "sms_maybe_failed"
 
         return self.async_show_form(
             step_id="sms",

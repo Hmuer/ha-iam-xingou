@@ -61,7 +61,8 @@
                                  "no_devices":  "该账号下没有找到设备",
                                  "unknown":  "未知错误，请查看日志",
                                  "invalid_json":  "键值映射必须是合法的 JSON 对象",
-                                 "invalid_token":  "Token 无效或已过期"
+                                 "invalid_token":  "Token 无效或已过期",
+                                 "sms_maybe_failed":  "短信接口返回异常，但验证码可能已经发出。请直接填入收到的验证码；如果没收到，可以稍后重试或使用「手动导入 Token」。"
                              },
                    "abort":  {
                                  "reauth_successful":  "重新登录成功",
