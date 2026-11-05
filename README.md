@@ -23,7 +23,7 @@
 ## 安装（HACS 自定义仓库）
 
 1. 打开 HACS → 右上角 ⋮ → **Custom repositories**
-2. 仓库地址填：`https://github.com/Hmuer/iam`
+2. 仓库地址填：`https://github.com/Hmuer/ha-iam-xingou`
 3. Category 选择 **Integration**，点击 Add
 4. 在 HACS 里搜索 **IAM Xingou** 并下载
 5. 重启 Home Assistant

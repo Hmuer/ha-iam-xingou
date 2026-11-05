@@ -3,10 +3,10 @@
   "name": "IAM Xingou (心够智家)",
   "codeowners": ["@Hmuer"],
   "config_flow": true,
-  "documentation": "https://github.com/Hmuer/iam",
-  "issue_tracker": "https://github.com/Hmuer/iam/issues",
+  "documentation": "https://github.com/Hmuer/ha-iam-xingou",
+  "issue_tracker": "https://github.com/Hmuer/ha-iam-xingou/issues",
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "0.2.3",
+  "version": "0.2.4",
   "loggers": ["custom_components.iam_xingou"]
 }
