@@ -61,7 +61,7 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
         self._phone: str = ""
         self._api: IamXingouApi | None = None
         self._devices: list[dict[str, str]] = []
-        self._sms_warning: bool = False
+        self._status: str = ""
 
     # ------------------------------------------------------------ user steps
     async def async_step_user(
@@ -73,127 +73,103 @@ class IamXingouConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_phone(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        """Phone + SMS code on one page, like the official app.
+
+        Submitting with an empty code asks the cloud to send a new SMS; the
+        form is shown again with the API result, so a received code can still
+        be entered when the send request reported an error.
+        """
         errors: dict[str, str] = {}
         if user_input is not None:
-            phone = user_input[CONF_PHONE].strip()
-            api = IamXingouApi(async_get_clientsession(self.hass))
-            try:
-                await api.async_send_code(phone)
-            except IamXingouRateLimitError:
-                # Too many requests: still allow the user to enter a code that
-                # was requested from the official app (same cloud backend).
-                self._phone = phone
-                self._api = api
-                return await self.async_step_sms()
-            except IamXingouError as err:
-                # The cloud sometimes answers with an error code while still
-                # delivering the SMS. Never block the flow on this: let the
-                # user type the code (or request it from the official app).
-                _LOGGER.warning("send code failed, continuing anyway: %s", err)
-                self._phone = phone
-                self._api = api
-                self._sms_warning = True
-                return await self.async_step_sms()
+            phone = str(user_input.get(CONF_PHONE) or "").strip()
+            code = str(user_input.get(CONF_CODE) or "").strip()
+
+            if not phone:
+                errors["base"] = "phone_required"
             else:
-                self._phone = phone
-                self._api = api
-                return await self.async_step_sms()
+                if self._phone != phone or self._api is None:
+                    self._phone = phone
+                    self._api = IamXingouApi(
+                        async_get_clientsession(self.hass),
+                        user_name=phone,
+                    )
+
+                if not code:
+                    try:
+                        await self._api.async_send_code(phone)
+                    except IamXingouRateLimitError as err:
+                        self._status = (
+                            f"发送被限流：{err}。如果手机已经收到验证码，"
+                            "直接填入下方并提交即可"
+                        )
+                    except IamXingouError as err:
+                        self._status = (
+                            f"发送失败：{err}。如果手机已经收到验证码，"
+                            "直接填入下方并提交即可"
+                        )
+                    else:
+                        self._status = f"验证码已发送到 {phone}，请填写收到的验证码"
+                    return self.async_show_form(
+                        step_id="phone",
+                        data_schema=vol.Schema(
+                            {
+                                vol.Required(
+                                    CONF_PHONE, default=phone
+                                ): TextSelector(
+                                    TextSelectorConfig(type=TextSelectorType.TEL)
+                                ),
+                                vol.Optional(CONF_CODE, default=""): TextSelector(
+                                    TextSelectorConfig(
+                                        type=TextSelectorType.NUMBER
+                                    )
+                                ),
+                            }
+                        ),
+                        errors=errors,
+                        description_placeholders={
+                            "status": self._status or "请填写手机号和验证码"
+                        },
+                    )
+
+                try:
+                    await self._api.async_login(phone, code)
+                    home = await self._api.async_homepage()
+                except IamXingouAuthError:
+                    errors["base"] = "invalid_code"
+                except IamXingouConnectionError:
+                    errors["base"] = "cannot_connect"
+                except IamXingouError as err:
+                    _LOGGER.warning("login failed: %s", err)
+                    errors["base"] = "unknown"
+                else:
+                    self._devices = extract_devices(home)
+                    if not self._devices:
+                        errors["base"] = "no_devices"
+                    else:
+                        await self.async_set_unique_id(
+                            self._api.user_name or phone
+                        )
+                        return await self.async_step_devices()
 
         return self.async_show_form(
             step_id="phone",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_PHONE): TextSelector(
+                    vol.Required(
+                        CONF_PHONE, default=self._phone or ""
+                    ): TextSelector(
                         TextSelectorConfig(type=TextSelectorType.TEL)
-                    )
-                }
-            ),
-            errors=errors,
-        )
-
-    async def async_step_token(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Import an existing access token (useful while SMS is rate limited)."""
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            token = user_input[CONF_TOKEN].strip()
-            user_name = user_input[CONF_USER_NAME].strip()
-            user_id = (user_input.get("user_id") or "").strip()
-            api = IamXingouApi(
-                async_get_clientsession(self.hass),
-                token=token,
-                user_name=user_name,
-                user_id=user_id,
-            )
-            try:
-                home = await api.async_homepage()
-            except IamXingouAuthError:
-                errors["base"] = "invalid_token"
-            except IamXingouError as err:
-                _LOGGER.warning("token import failed: %s", err)
-                errors["base"] = "unknown"
-            else:
-                self._devices = extract_devices(home)
-                if not self._devices:
-                    errors["base"] = "no_devices"
-                else:
-                    self._api = api
-                    self._phone = user_name
-                    await self.async_set_unique_id(user_name)
-                    return await self.async_step_devices()
-
-        return self.async_show_form(
-            step_id="token",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_TOKEN): TextSelector(),
-                    vol.Required(CONF_USER_NAME): TextSelector(),
-                    vol.Optional("user_id"): TextSelector(),
-                }
-            ),
-            errors=errors,
-        )
-
-    async def async_step_sms(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        errors: dict[str, str] = {}
-        if user_input is not None and self._api is not None:
-            try:
-                await self._api.async_login(self._phone, user_input[CONF_CODE].strip())
-                home = await self._api.async_homepage()
-            except IamXingouAuthError:
-                errors["base"] = "invalid_code"
-            except IamXingouConnectionError:
-                errors["base"] = "cannot_connect"
-            except IamXingouError as err:
-                _LOGGER.warning("login failed: %s", err)
-                errors["base"] = "unknown"
-            else:
-                self._devices = extract_devices(home)
-                if not self._devices:
-                    errors["base"] = "no_devices"
-                else:
-                    await self.async_set_unique_id(self._api.user_name or self._phone)
-                    return await self.async_step_devices()
-
-        if self._sms_warning and not errors:
-            errors["base"] = "sms_maybe_failed"
-
-        return self.async_show_form(
-            step_id="sms",
-            description_placeholders={"phone": self._phone},
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_CODE): TextSelector(
+                    ),
+                    vol.Optional(CONF_CODE, default=""): TextSelector(
                         TextSelectorConfig(type=TextSelectorType.NUMBER)
-                    )
+                    ),
                 }
             ),
             errors=errors,
+            description_placeholders={
+                "status": self._status or "填入手机号，验证码留空提交即可获取验证码"
+            },
         )
-
     async def async_step_devices(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:

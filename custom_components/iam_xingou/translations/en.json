@@ -29,13 +29,6 @@
                                                                 "code":  "SMS code"
                                                             }
                                                },
-                                "phone":  {
-                                              "title":  "Sign in to Xingou",
-                                              "description":  "Enter the phone number registered with the Xingou (心够智家) app. An SMS code will be sent.",
-                                              "data":  {
-                                                           "phone":  "Phone number"
-                                                       }
-                                          },
                                 "user":  {
                                              "title":  "Sign-in method",
                                              "menu_options":  {
@@ -51,18 +44,27 @@
                                                            "user_name":  "User name (phone)",
                                                            "user_id":  "User id (optional)"
                                                        }
+                                          },
+                                "phone":  {
+                                              "title":  "Sign in to Xingou",
+                                              "description":  "Same as the mobile app: enter phone + SMS code.\n\n**Request a code**: leave the code empty and submit.\n\n**Status**: {status}",
+                                              "data":  {
+                                                           "phone":  "Phone number",
+                                                           "code":  "SMS code (after you receive it)"
+                                                       }
                                           }
                             },
                    "error":  {
                                  "sms_failed":  "Could not send the SMS code. Check the phone number and try again.",
                                  "sms_rate_limited":  "Too many requests. Wait 1-2 minutes and try again.",
-                                 "invalid_code":  "Wrong or expired code",
+                                 "invalid_code":  "Invalid or expired code",
                                  "cannot_connect":  "Cannot reach the Xingou cloud",
                                  "no_devices":  "No device found on this account",
                                  "unknown":  "Unexpected error, check the logs",
                                  "invalid_json":  "The key mapping must be a valid JSON object",
                                  "invalid_token":  "Invalid or expired token",
-                                 "sms_maybe_failed":  "The SMS API returned an error, but the code may still have been delivered. Enter it below; if you did not get one, retry later or use manual token import."
+                                 "sms_maybe_failed":  "The SMS API returned an error, but the code may still have been delivered. Enter it below; if you did not get one, retry later or use manual token import.",
+                                 "phone_required":  "Phone number is required"
                              },
                    "abort":  {
                                  "reauth_successful":  "Re-authentication successful",
